@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>JSONP usage example</title>
+		<script type="text/javascript" src="jsonp.js"></script>
+		<script type="text/javascript">
+			// Ensure DOM is loaded, and then do the request.
+			window.onload = function() {
+				document.body.innerHTML = '<p>Loading cat pictures from Flickr ...</p>';
+
+				// Query Flickr for cat pictures using JSONP.
+				jsonp('http://api.flickr.com/services/feeds/photos_public.gne?tags=cat' +
+				      '&tagmode=any&format=json&jsoncallback=?', function(err, flickr) {
+
+					// If an error occurred, display a message.
+					if (err) {
+						document.body.innerHTML = 'Could not find cat pictures. ' + err;
+						return;
+					}
+
+					// If we got a list of cat pictures, display those with links to Flickr.
+					var html = '<p>Displaying ' + flickr.items.length + ' cat pictures from Flickr:<br>';
+					for (var i = 0; i < flickr.items.length; i++) {
+						var pic = flickr.items[i];
+						html += '<a href="' + pic.link + '" title="' + pic.title + '">';
+						html += '<img src="' + pic.media.m + '"';
+						html += ' style="border: 0; margin: 5px; height: 100px;">';
+						html += '</a>';
+					}
+					html += '</p>';
+					document.body.innerHTML = html;
+
+					// Print JSON in console for debugging; only if console is supported.
+					window.console && console.log(flickr.items);
+				}, 2000); // Timeout is 2 seconds.
+
+			};
+		</script>
+	</head>
+	<body>
+		<p>42 is the answer.</p>
+	</body>
+</html>
