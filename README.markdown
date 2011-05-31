@@ -7,8 +7,12 @@ I get to releasing this software in the public domain.
 
 The file `jsonp.js` contains the implementation. You can minify it if you want.
 
-The file `jsonp-usage-example.js` is just an example how to use it to query
+The file `jsonp-usage-example.html` is just an example how to use it to query
 Flickr for cat pictures with a timeout of 2 seconds.
+
+Happy hacking!
+
+— [Bjarke Walling](https://twitter.com/walling)
 
 
 LICENSE
