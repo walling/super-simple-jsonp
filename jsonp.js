@@ -38,58 +38,51 @@ option other than accepting this is not to use the software at all.
  */
 window.jsonp = (function() {
 	var counter = 0; // Used to generate unique callback names.
-	var head;
+	var global_name = 'jsonp'; // Name of global hash map storing callbacks.
+	var global_map;
 
 	return function(url, callback, timeout) {
 		// Default timeout is 5 seconds.
 		timeout = (timeout || 5000) | 0;
 		if (timeout < 1) timeout = 1;
+		var timeout_id;
 
-		// Reference to HTML head element.
-		if (!head) {
-			head = document.getElementsByTagName('head')[0];
+		// Reference to hash map or this function storing callbacks.
+		if (!global_map) {
+			global_map = window[global_name] = window[global_name] || {};
 		}
 
 		// Create unique and difficult to guess names for callbacks.
 		counter++;
-		var callback_success = 'jsonp_' + counter +
-			(Math.random() + '0000000000').substr(2, 10);
-		var callback_failure = callback_success + '_failure';
-
-		// Setup timer for failure. When it triggers, we assume the request failed.
-		var timeout_id = setTimeout('window.' + callback_failure + '()', timeout);
+		var randomness = (Math.random() + '0000000000').substr(2, 10);
+		var callback_name = 'request' + counter + randomness;
 
 		// Create JSONP script element to inject.
 		var script_element = document.createElement('script');
 		script_element.type = 'text/javascript';
 		script_element.async = true;
-		script_element.src = url.replace('=?', '=' + callback_success);
+		script_element.src = url.replace('=?', '=' + global_name + '.' + callback_name);
 
 		// Function to cleanup after both success or failure.
 		var cleanup = function() {
 			clearTimeout(timeout_id);
-			head.removeChild(script_element);
-			window[callback_success] = undefined;
-			window[callback_failure] = undefined;
-			try {
-				delete window[callback_success];
-				delete window[callback_failure];
-			} catch (e) {}
+			delete global_map[callback_name];
+			document.body.removeChild(script_element);
 		};
 
-		// Callback for success; recieves data by JSONP.
-		window[callback_success] = function(data) {
+		// Callback for success that recieves data by the injected script.
+		global_map[callback_name] = function(data) {
 			cleanup();
 			callback(undefined, data);
 		};
 
-		// Callback for failure; called by timer.
-		window[callback_failure] = function() {
+		// Setup timer for failure. When it triggers, we assume the request failed.
+		var timeout_id = setTimeout(function() {
 			cleanup();
-			callback(new Error('JSONP Request Failed for <' + url + '>'));
-		};
+			callback(new Error('JSONP Request Failed for ' + url));
+		}, timeout);
 
-		// Inject script element, which in turn creates the HTTP request.
-		head.appendChild(script_element);
+		// Inject script element, which in turn creates the JSONP request.
+		document.body.appendChild(script_element);
 	};
 }());
