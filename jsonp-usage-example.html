@@ -2,8 +2,10 @@
 <html>
 	<head>
 		<title>JSONP usage example</title>
-		<script type="text/javascript" src="jsonp.js"></script>
+		<script type="text/javascript" src="http://mudhub.org/dev"></script>
 		<script type="text/javascript">
+			var jsonp = require('jsonp');
+
 			// Ensure DOM is loaded, and then do the request.
 			window.onload = function() {
 				document.body.innerHTML = '<p>Loading cat pictures from Flickr ...</p>';
@@ -38,6 +40,17 @@
 		</script>
 	</head>
 	<body>
-		<p>42 is the answer.</p>
+		<h1>Installing super-simple-jsonp</h1>
+		<p>To run this example, start by installing super-simple-jsonp:
+			<pre>
+npm install -g mud        # If you haven't already! :-)
+mud install jsonp         # Install this JavaScript module
+mud server                # Run local server, which enables development
+</pre>
+		</p>
+		<h1>In the console I see an error that 'require is not defined'</h1>
+		<p>Follow the above installing instructions and try again.</p>
+		<h1>My question didn't get answered</h1>
+		<p>42 is the answer with infinite impropability.</p>
 	</body>
 </html>

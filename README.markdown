@@ -15,7 +15,39 @@ Happy hacking!
 — [Bjarke Walling](https://twitter.com/walling)
 
 
-LICENSE
+Install
+-------
+
+Install it with Mud:
+
+    npm install -g mud        # If you haven't already! :-)
+    mud install jsonp         # Install this JavaScript module
+    mud server                # Run local server, which enables development
+
+Read more about Mud package manager at <http://mudhub.org/>.
+
+
+Usage
+-----
+
+For local development, just start `mud server` and in your HTML:
+
+    <script src="http://mudhub.org/dev"></script>
+    <script>
+      var jsonp = require('jsonp');
+      // use it here
+    </script>
+
+To deploy, use `mud inline your.html` or to just minify the module:
+
+    mud modules jsonp --global --compile > jsonp.min.js
+
+You can also use --compile-advanced for more aggressive optimizations (which I
+did not test yet). The minifier is Closure. Read more at the
+[Mud website](http://mudhub.org/).
+
+
+License
 -------
 
 Permission is granted to use, modify, and / or redistribute at will.
