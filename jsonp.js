@@ -31,18 +31,25 @@ var global_map;
  * specified. Default is 5 seconds. Example:
  *
  *     jsonp('http://api.flickr.com/services/feeds/photos_public.gne?tags=cat' +
- *           '&tagmode=any&format=json&jsoncallback=?', function(err, flickr) {
+ *           '&tagmode=any&format=json&jsoncallback=?',
+ *           {timeout: 2000}, function(err, flickr) {
  *       if (err) {
  *         console.log('Error (' + err + '): Could not find cat pictures.');
  *         return;
  *       }
  *       console.log('Found ' + flickr.items.length + ' cat pictures!');
  *       // Do something with flickr.items
- *     }, 2000);
+ *     });
  */
-module.exports = function(url, callback, timeout) {
+module.exports = function(url, options, callback) {
+	// Options are optional.
+	if (callback === undefined) {
+		callback = options;
+	}
+	callback = callback || function() {};
+
 	// Default timeout is 5 seconds.
-	timeout = (timeout || 5000) | 0;
+	var timeout = (options.timeout || 5000) | 0;
 	if (timeout < 1) timeout = 1;
 	var timeout_id;
 
