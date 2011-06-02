@@ -30,7 +30,8 @@ Read more about Mud package manager at <http://mudhub.org/>.
 Usage
 -----
 
-For local development, just start `mud server` and in your HTML:
+Look in the inline documentation or the example to see how you use it. For
+local development, just start `mud server` and in your HTML:
 
     <script src="http://mudhub.org/dev"></script>
     <script>
