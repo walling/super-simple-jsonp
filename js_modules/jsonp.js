@@ -23,6 +23,7 @@ option other than accepting this is not to use the software at all.
 var counter = 0; // Used to generate unique callback names.
 var global_name = 'jsonp'; // Name of global hash map storing callbacks.
 var global_map;
+var noop = function() {};
 
 /**
  * Load data using JSONP request. This performs a GET HTTP request for the
@@ -50,7 +51,7 @@ module.exports = function(url, options, callback) {
 	if (callback === undefined) {
 		callback = options;
 	}
-	callback = callback || function(err, data) {};
+	callback = callback || noop;
 
 	// Default timeout is 5 seconds.
 	var timeout = (options.timeout || 5000) | 0;
@@ -74,11 +75,8 @@ module.exports = function(url, options, callback) {
 	script_element.src = url.replace('=?', '=' + global_name + '.' + callback_name);
 
 	// Funktion to invoke callback with result and cleanup.
-	var got_result = false;
 	var result = function(data) {
-		// The result must only be provided once.
-		if (got_result) return;
-		got_result = true;
+		result = noop; // The result must only be provided once.
 
 		// Cleanup after both success or failure.
 		clearTimeout(failure_timer);
@@ -119,7 +117,7 @@ module.exports = function(url, options, callback) {
 
 	// Return function that cancels this JSONP request.
 	return function() {
-		callback = function(err, data) {};
+		callback = noop; // Disable callback on cancel.
 		result(0);
 	};
 };
