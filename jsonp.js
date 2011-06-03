@@ -112,4 +112,10 @@ module.exports = function(url, options, callback) {
 
 	// Inject script element, which in turn creates the JSONP request.
 	document.body.appendChild(script_element);
+
+	// Return function that cancels this JSONP request.
+	return function() {
+		callback = function(data) {};
+		result(0);
+	};
 };
