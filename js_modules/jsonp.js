@@ -29,12 +29,17 @@ var noop = function() {};
  * Load data using JSONP request. This performs a GET HTTP request for the
  * given url and invokes callback with the data. The callback always recieves
  * the arguments: err, data. An optional timeout before failing can be
- * specified. Default is 5 seconds. Example:
+ * specified. Default is 5 seconds. An optional strict mode can be enabled,
+ * where more error handling is done on the JSONP result, ie. `null` and
+ * `{"error":"Msg"}` are interpreted as errors. Strict mode is default off.
+ *
+ * Example:
  *
  *     var cancel_flickr = jsonp('http://api.flickr.com/services/feeds' +
  *                               '/photos_public.gne?tags=cat&tagmode=any' +
  *                               '&format=json&jsoncallback=?',
- *                               {timeout: 2000}, function(err, flickr) {
+ *                               {timeout: 2000, strict: true},
+ *                               function(err, flickr) {
  *       if (err) {
  *         console.log('Error (' + err + '): Could not find cat pictures.');
  *         return;
@@ -87,16 +92,16 @@ module.exports = function(url, options, callback) {
 		script_element = undefined; // So MSIE does not leak memory.
 
 		// Invoke callback with either error or actual data.
-		if (data === undefined || data === null) {
+		if (data === undefined || (data === null && options.strict)) {
 			callback(new Error('JSONP Request Failed for ' + url));
-		} else if (data.error !== undefined) {
-			callback(new Error('' + data.error)); // JSONP error response.
+		} else if (data.error !== undefined && options.strict) {
+			callback(new Error('' + data.error)); // Error response in strict mode.
 		} else {
 			callback(undefined, data);
 		}
 	};
 	var failure = function() {
-		result(null);
+		result(undefined);
 	};
 
 	// Callback for success that recieves data by the injected script.
