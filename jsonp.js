@@ -69,24 +69,45 @@ module.exports = function(url, options, callback) {
 	script_element.async = true;
 	script_element.src = url.replace('=?', '=' + global_name + '.' + callback_name);
 
-	// Function to cleanup after both success or failure.
-	var cleanup = function() {
+	// Funktion to invoke callback with result and cleanup.
+	var got_result = false;
+	var result = function(data) {
+		// The result must only be provided once.
+		if (got_result) return;
+		got_result = true;
+
+		// Cleanup after both success or failure.
 		clearTimeout(timeout_id);
 		delete global_map[callback_name];
+		script_element.onreadystatechange = undefined;
+		script_element.onerror = undefined;
 		document.body.removeChild(script_element);
+
+		// Invoke callback with either error or actual data.
+		if (data === undefined || data === null) {
+			callback(new Error('JSONP Request Failed for ' + url));
+		} else {
+			callback(undefined, data);
+		}
 	};
 
 	// Callback for success that recieves data by the injected script.
-	global_map[callback_name] = function(data) {
-		cleanup();
-		callback(undefined, data);
-	};
+	global_map[callback_name] = result;
 
 	// Setup timer for failure. When it triggers, we assume the request failed.
 	var timeout_id = setTimeout(function() {
-		cleanup();
-		callback(new Error('JSONP Request Failed for ' + url));
+		result(null);
 	}, timeout);
+
+	// Fail faster if we know that the script is supposed to be executed.
+	script_element.onreadystatechange = function() {
+		if (this.readyState === 'loaded' || this.readyState === 'complete') {
+			result(null);
+		}
+	};
+	script_element.onerror = function() {
+		result(null);
+	};
 
 	// Inject script element, which in turn creates the JSONP request.
 	document.body.appendChild(script_element);
