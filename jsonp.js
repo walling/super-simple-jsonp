@@ -50,7 +50,7 @@ module.exports = function(url, options, callback) {
 	if (callback === undefined) {
 		callback = options;
 	}
-	callback = callback || function() {};
+	callback = callback || function(err, data) {};
 
 	// Default timeout is 5 seconds.
 	var timeout = (options.timeout || 5000) | 0;
@@ -119,7 +119,7 @@ module.exports = function(url, options, callback) {
 
 	// Return function that cancels this JSONP request.
 	return function() {
-		callback = function(data) {};
+		callback = function(err, data) {};
 		result(0);
 	};
 };
