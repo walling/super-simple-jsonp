@@ -86,6 +86,8 @@ module.exports = function(url, options, callback) {
 		// Invoke callback with either error or actual data.
 		if (data === undefined || data === null) {
 			callback(new Error('JSONP Request Failed for ' + url));
+		} else if (data.error !== undefined) {
+			callback(new Error('' + data.error)); // JSONP error response.
 		} else {
 			callback(undefined, data);
 		}
