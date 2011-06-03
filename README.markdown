@@ -5,7 +5,7 @@ This is a super simple implementation of JSONP in client-side JavaScript, which
 handles errors in an elegant way. Read the below license, which is the closest
 I get to releasing this software in the public domain.
 
-The file `jsonp.js` contains the implementation. You can minify it if you want.
+The file `js_modules/jsonp.js` is the implementation. Minify it if you want.
 
 The file `jsonp-usage-example.html` is just an example how to use it to query
 Flickr for cat pictures with a timeout of 2 seconds.
