@@ -90,14 +90,15 @@ module.exports = function(url, options, callback) {
 			callback(undefined, data);
 		}
 	};
+	var failure = function() {
+		result(null);
+	};
 
 	// Callback for success that recieves data by the injected script.
 	global_map[callback_name] = result;
 
 	// Setup timer for failure. When it triggers, we assume the request failed.
-	var timeout_id = setTimeout(function() {
-		result(null);
-	}, timeout);
+	var timeout_id = setTimeout(failure, timeout);
 
 	// Fail faster if we know that the script is supposed to be executed.
 	script_element.onreadystatechange = function() {
@@ -105,9 +106,7 @@ module.exports = function(url, options, callback) {
 			result(null);
 		}
 	};
-	script_element.onerror = function() {
-		result(null);
-	};
+	script_element.onerror = failure;
 
 	// Inject script element, which in turn creates the JSONP request.
 	document.body.appendChild(script_element);
