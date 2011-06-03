@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tests for super-simple-jsonp</title>
+		<script type="text/javascript" src="http://mudhub.org/dev"></script>
+		<script type="text/javascript" src="http://mudhub.org/m/common"></script>
+		<script type="text/javascript">
+			var common = require('common');
+			var jsonp  = require('jsonp');
+
+
+			/**
+			 * Function to define a timeout before a test fails.
+			 */
+			var timeout_failure = (function() {
+				var timer_id = null;
+
+				return function(next, milliseconds) {
+					if (timer_id !== null) {
+						clearTimeout(timer_id);
+						timer_id = null;
+					}
+					if (next) {
+						timer_id = setTimeout(function() {
+							next(new Error('Timeout (' + milliseconds + 'ms)'));
+						}, milliseconds);
+					}
+				};
+			}());
+
+
+			/**
+			 * Print something on the screen and in the console if supported.
+			 */
+			function print(text) {
+				window.console && console.log(text);
+				document.getElementById('console').innerHTML +=
+					text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;') +
+					'<br>';
+			}
+
+
+			// Ensure DOM is loaded, and then run the tests.
+			window.onload = function() {
+
+				common.step([
+
+					function(value, next) {
+						if (typeof jsonp === 'undefined') {
+							return next(new Error('Start `mud server` so require("jsonp") works'));
+						}
+
+						print('Test: Quering Flickr for cat pictures');
+						timeout_failure(next, 5100);
+						jsonp('http://api.flickr.com/services/feeds/photos_public.gne' +
+							'?tags=cat&tagmode=any&format=json&jsoncallback=?', next);
+					},
+
+					function(value, next) {
+						print('Test: Ensure that script element is cleaned up after success');
+						if (document.body.getElementsByTagName('script').length !== 0) {
+							return next(new Error('Script element was not cleanup up after success'));
+						}
+
+						print('Test: Short timeout makes request fail');
+						timeout_failure(next, 100);
+						jsonp('http://api.flickr.com/services/feeds/photos_public.gne' +
+						      '?tags=cat&tagmode=any&format=json&jsoncallback=?',
+						      {timeout: 1}, function(err, data) {
+							if (err && !data) {
+								next(null, 'passed');
+							}
+						});
+					},
+
+					function(value, next) {
+						print('Test: Ensure that script element is cleaned up after failure');
+						if (document.body.getElementsByTagName('script').length !== 0) {
+							return next(new Error('Script element was not cleanup up after failure'));
+						}
+
+						print('Test: Canceling a request');
+						timeout_failure(next, 200);
+						var cancel_request = jsonp(
+								'http://api.flickr.com/services/feeds/photos_public.gne' +
+								'?tags=cat&tagmode=any&format=json&jsoncallback=?',
+								function(err, data) {
+							next(new Error('Request was not canceled'));
+						});
+						setTimeout(function() {
+							cancel_request();
+							next(null, 'passed');
+						}, 100);
+					},
+
+					function(value, next) {
+						print('Test: Requesting non-existing URL fails');
+						timeout_failure(next, 500);
+						jsonp('http://non-existing.tld/', function(err, data) {
+							if (err && !data) {
+								next(null, 'passed');
+							}
+						});
+					},
+
+					function(value, next) {
+						print('Test: Requesting non-JSONP service at existing URL fails');
+						timeout_failure(next, 1100);
+						jsonp('http://twitter.com/', {timeout: 1000}, function(err, data) {
+							if (err && !data) {
+								next(null, 'passed');
+							}
+						});
+					},
+
+					function(value, next) {
+						print('ALL TESTS PASSED!');
+						timeout_failure();
+					}
+
+				], function(err) {
+					print('TEST FAILED! ' + err);
+				});
+
+			};
+		</script>
+	</head>
+	<body>
+		<div id="console" style="white-space: pre;"></div>
+	</body>
+</html>

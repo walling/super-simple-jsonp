@@ -51,10 +51,22 @@ did not test yet). The minifier is Closure. Read more at the
 Error handling
 --------------
 
-If the connection fails or the URL does not exists, the request will fail with
-a generic JSONP Request Failed message. This is also the case if the result is
-null, undefined or the internal JSONP callback was called without any
-arguments. The webservice can signal errors using `{"error":"Total Failure"}`.
+If the connection fails, the URL does not exists or the result is not JSON or
+non-existing, or the internal JSONP callback was called without any arguments,
+the request fails with a generic JSONP Request Failed message. If you use
+strict mode, the request also fails if the result is null and the webservice
+can signal errors using `{"error":"Total Failure"}`.
+
+
+Tested browsers
+---------------
+
+Open `tests.html` in your webbrowser to run the tests. Tested browsers:
+
+ *  Google Chrome 11.0 for Linux
+ *  Google Chrome 11.0 for Windows
+ *  Firefox 3.6 for Linux
+ *  MS Internet Explorer 6.0 [FAILS, probably in `common.step`]
 
 
 License
