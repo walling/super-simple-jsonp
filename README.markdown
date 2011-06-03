@@ -48,6 +48,15 @@ did not test yet). The minifier is Closure. Read more at the
 [Mud website](http://mudhub.org/).
 
 
+Error handling
+--------------
+
+If the connection fails or the URL does not exists, the request will fail with
+a generic JSONP Request Failed message. This is also the case if the result is
+null, undefined or the internal JSONP callback was called without any
+arguments. The webservice can signal errors using `{"error":"Total Failure"}`.
+
+
 License
 -------
 

@@ -30,9 +30,10 @@ var global_map;
  * the arguments: err, data. An optional timeout before failing can be
  * specified. Default is 5 seconds. Example:
  *
- *     jsonp('http://api.flickr.com/services/feeds/photos_public.gne?tags=cat' +
- *           '&tagmode=any&format=json&jsoncallback=?',
- *           {timeout: 2000}, function(err, flickr) {
+ *     var cancel_flickr = jsonp('http://api.flickr.com/services/feeds' +
+ *                               '/photos_public.gne?tags=cat&tagmode=any' +
+ *                               '&format=json&jsoncallback=?',
+ *                               {timeout: 2000}, function(err, flickr) {
  *       if (err) {
  *         console.log('Error (' + err + '): Could not find cat pictures.');
  *         return;
@@ -40,6 +41,9 @@ var global_map;
  *       console.log('Found ' + flickr.items.length + ' cat pictures!');
  *       // Do something with flickr.items
  *     });
+ *     
+ *     // Maybe you want to cancel the request to find cat pictures on Flickr:
+ *     cancel_flickr();
  */
 module.exports = function(url, options, callback) {
 	// Options are optional.
