@@ -109,7 +109,7 @@ module.exports = function(url, options, callback) {
 	// Fail faster if we know that the script is supposed to be executed.
 	script_element.onreadystatechange = function() {
 		if (this.readyState === 'loaded' || this.readyState === 'complete') {
-			result(null);
+			failure();
 		}
 	};
 	script_element.onerror = failure;
