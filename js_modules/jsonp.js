@@ -88,7 +88,7 @@ module.exports = function(url, options, callback) {
 		delete global_map[callback_name];
 		script_element.onreadystatechange = undefined;
 		script_element.onerror = undefined;
-		document.body.removeChild(script_element);
+		script_element.parentNode.removeChild(script_element);
 		script_element = undefined; // So MSIE does not leak memory.
 
 		// Invoke callback with either error or actual data.
