@@ -51,7 +51,7 @@ module.exports = function(url, options, callback) {
 	// Default timeout is 5 seconds.
 	var timeout = (options.timeout || 5000) | 0;
 	if (timeout < 1) timeout = 1;
-	var timeout_id;
+	var failure_timer;
 
 	// Reference to hash map or this function storing callbacks.
 	if (!global_map) {
@@ -77,7 +77,7 @@ module.exports = function(url, options, callback) {
 		got_result = true;
 
 		// Cleanup after both success or failure.
-		clearTimeout(timeout_id);
+		clearTimeout(failure_timer);
 		delete global_map[callback_name];
 		script_element.onreadystatechange = undefined;
 		script_element.onerror = undefined;
@@ -100,7 +100,7 @@ module.exports = function(url, options, callback) {
 	global_map[callback_name] = result;
 
 	// Setup timer for failure. When it triggers, we assume the request failed.
-	var timeout_id = setTimeout(failure, timeout);
+	var failure_timer = setTimeout(failure, timeout);
 
 	// Fail faster if we know that the script is supposed to be executed.
 	script_element.onreadystatechange = function() {
